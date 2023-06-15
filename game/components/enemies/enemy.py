@@ -2,6 +2,7 @@ import pygame
 import random
 
 from pygame.sprite import Sprite
+from game.components.bullets.bullet import Bullet
 from game.utils.constants import SCREEN_HEIGHT, ENEMY_1, ENEMY_2, SCREEN_WIDTH
 
 class Enemy(Sprite):
@@ -12,10 +13,10 @@ class Enemy(Sprite):
     SPEED_X = 5
     SPEED_Y = 5
     mov_x = {0:'left', 1:'right'}
-    TYPE = {0:pygame.transform.scale(ENEMY_1,(40,60)), 1:pygame.transform.scale(ENEMY_2,(40,60))}
 
     def __init__(self):
-        self.image = self.TYPE[random.randint(0, 1)]
+        self.model = {0:pygame.transform.scale(ENEMY_1,(40,60)), 1:pygame.transform.scale(ENEMY_2,(40,60))}
+        self.image = self.model[random.randint(0, 1)]
         self.rect = self.image.get_rect() 
         self.rect.x = self.X_POS_LIST[random.randint(0, 14)]
         self.rect.y = self.Y_POS 
@@ -24,15 +25,20 @@ class Enemy(Sprite):
         self.movement_x = self.mov_x[random.randint(0, 1)]
         self.move_x_for = random.randint(30, 100)
         self.index = 0
+        self.type = 'enemy'
+        self.shooting_time = random.randint(30, 50)
+        
 
-        if self.image == self.TYPE[1]:  # Si la imagen es "enemy_2"
-            self.speed_x += 5  # Aumentar la velocidad en 5 unidades
+
+    def update(self, ships, game):
 
 
 
-    def update(self, ships):
+        if self.image == self.model[1]:  # Si la imagen es "enemy_2"
+            self.speed_x = 15  # Aumentar la velocidad en 5 unidades
 
         self.rect.y += self.speed_y
+        self.shoot(game.bullet_manager)
 
         if self.movement_x == 'left' :
             self.rect.x -= self.speed_x
@@ -55,3 +61,10 @@ class Enemy(Sprite):
         elif (self.index >= self.move_x_for and self.movement_x == 'left') or (self.rect.x <= 10 ):
             self.movement_x = 'right'
             self.index = 0
+
+    def shoot(self, bullet_manager):
+        current_time = pygame.time.get_ticks()
+        if self.shooting_time <= current_time:
+            bullet = Bullet(self)
+            bullet_manager.add_bullet(bullet)
+            self.shooting_time += random.randint(30, 50)
