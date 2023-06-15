@@ -16,10 +16,18 @@ class Bullet(Sprite):
         self.owner = spaceship.type
 
     def update(self, bullets):
-        self.rect.y += self.SPEED
+        # direccion de la bala
+        if self.image == self.BULLETS['player']:
+            self.rect.y -= self.SPEED
+        else:
+            self.rect.y += self.SPEED
 
+        # validamos que cuando salga de la pantalla se remueva
         if self.rect.y >= SCREEN_HEIGHT :
             bullets.remove(self)
+        elif self.rect.y <= 0:
+            bullets.remove(self)
+
     
     def draw(self, screen):
         screen.blit(self.image,(self.rect.x,self.rect.y))
