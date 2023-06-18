@@ -22,18 +22,27 @@ class Spaceship(Sprite):
   
     
    
-    def update(self, user_input, game):
+    def update(self, game):
+        # Obtener el estado actual de las teclas
+        keys = pygame.key.get_pressed()
         
-        if user_input[pygame.K_LEFT]:
+        # Comprobar las teclas de movimiento horizontal
+        if keys[pygame.K_LEFT]:
             self.move_left()
-        elif user_input[pygame.K_RIGHT]:
+        elif keys[pygame.K_RIGHT]:
             self.move_right()
-        elif user_input[pygame.K_UP]:
+
+        # Comprobar las teclas de movimiento vertical
+        if keys[pygame.K_UP]:
             self.move_up()
-        elif user_input[pygame.K_DOWN]:
+        elif keys[pygame.K_DOWN]:
             self.move_down()
-        elif user_input[pygame.K_e]:
+
+        # Comprobar disparo
+        if keys[pygame.K_e]:
             self.shoot(game.bullet_manager)
+        
+
     
     #movimiento de jugador
     def move_left(self):
@@ -48,7 +57,6 @@ class Spaceship(Sprite):
         if self.rect.left > SCREEN_WIDTH - self.SPACESHIP_WIDTH:
             self.rect.x = 0
     
-
     def move_up(self):
         if self.rect.y > self.HALL_SCREEM_HEIGHT:
             self.rect.y -= 10
@@ -61,7 +69,7 @@ class Spaceship(Sprite):
         screen.blit(self.image,(self.rect.x,self.rect.y))
 
     def shoot(self, bullet_manager):
-    
+
         bullet = Bullet(self)
         bullet_manager.add_bullet(bullet)
             

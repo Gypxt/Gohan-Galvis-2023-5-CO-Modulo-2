@@ -23,11 +23,9 @@ class Bullet(Sprite):
             self.rect.y += self.SPEED
 
         # validamos que cuando salga de la pantalla se remueva
-        if self.rect.y >= SCREEN_HEIGHT :
+        if self.rect.y >= SCREEN_HEIGHT or self.rect.y <= 0:
             bullets.remove(self)
-        elif self.rect.y <= 0:
-            bullets.remove(self)
-
+        
     
     def draw(self, screen):
         screen.blit(self.image,(self.rect.x,self.rect.y))
