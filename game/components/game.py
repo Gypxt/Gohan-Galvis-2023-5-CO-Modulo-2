@@ -7,6 +7,7 @@ from game.components.enemies.enemy_manager import EnemyManager
 from game.components.enemies.enemy import Enemy
 from game.components.bullets.bullet_manager import BulletManager
 from game.components.menu import Menu
+from game.components.points_manager import PointManager
 
 class Game:
     def __init__(self):
@@ -22,10 +23,11 @@ class Game:
         self.player = Spaceship()
         self.enemy_manager = EnemyManager()
         self.bullet_manager = BulletManager()
-        self.menu = Menu('Press Any KeyTo Star....', self.screen)
+        self.menu = Menu( self.screen)
         self.running = False
-        self.death_count = 0
-        self.score = 0
+        self.points = PointManager()
+        
+        
 
     def execute(self):
         self.running = True
@@ -39,7 +41,7 @@ class Game:
       
     def run(self):
         # Game loop: events - update - draw
-        self.score = 0
+        self.game_reset()
         self.playing = True
         while self.playing:
             self.events()
@@ -53,10 +55,10 @@ class Game:
                 self.playing = False
 
     def update(self):
-        user_input = pygame.key.get_pressed()
-        self.player.update(user_input,self)
+        self.player.update(self)
         self.enemy_manager.update(self)
         self.bullet_manager.update(self)
+
         
 
     def draw(self):
@@ -66,7 +68,7 @@ class Game:
         self.player.draw(self.screen)
         self.enemy_manager.draw(self.screen)
         self.bullet_manager.draw(self.screen)
-        self.draw_score()
+        self.points.draw_score(self.screen)
         pygame.display.update()
         # pygame.display.flip()
         
@@ -83,27 +85,27 @@ class Game:
 
     def show_menu(self):
         self.menu.reset(self.screen)
-
-        if self.death_count > 0:
-            self.menu.update_meesage('new message')
-
-        self.menu.draw(self.screen)
+        
         half_screen_whidth = SCREEN_WIDTH // 2
         half_screen_height = SCREEN_HEIGHT // 2
 
+        if self.points.death_count == 0:
+            self.menu.draw(self.screen, 'Press Any KeyTo Star....')    
+        else:
+            self.menu.draw(self.screen, 'Press Any KeyTo Star....')    
+            self.menu.draw(self.screen, f'Score: {self.points.point}', half_screen_whidth, 350)    
+            self.menu.draw(self.screen, f'Deaths: {self.points.death_count}', half_screen_whidth, 400)    
+            self.menu.draw(self.screen, f'Highest Score: {self.points.highest_score}', half_screen_whidth, 450)    
+            pass
         icon = pygame.transform.scale(ICON,(80, 120))
-        self.screen.blit(icon, (half_screen_whidth - 50,half_screen_height - 150))
+        self.screen.blit(icon, (half_screen_whidth - 50, half_screen_height - 150))
 
         self.menu.update(self)
 
-    def update_score(self):
-        self.score += 1
+    def game_reset(self):
+        self.player.reset()
+        self.enemy_manager.reset()
+        self.points.reset()
+        self.bullet_manager.reset()
 
     
-    def draw_score(self):
-        font = pygame.font.Font(FONT_STYLE, 30)
-        text = font.render(f'Score: {self.score}', True, (255, 255,255))
-        text_rect = text.get_rect()
-        text_rect.center = (1000, 50)
-        self.screen.blit(text, text_rect)
-                                     

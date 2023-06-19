@@ -32,8 +32,6 @@ class Enemy(Sprite):
 
     def update(self, ships, game):
 
-
-
         if self.image == self.model[1]:  # Si la imagen es "enemy_2"
             self.speed_x = 15  # Aumentar la velocidad en 5 unidades
 
@@ -68,3 +66,5 @@ class Enemy(Sprite):
             bullet = Bullet(self)
             bullet_manager.add_bullet(bullet)
             self.shooting_time += random.randint(30, 50)
+
+    
