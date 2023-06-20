@@ -16,9 +16,9 @@ class Menu:
         self.handle_events_on_menu(game)
         
 
-    def draw(self, screen, message, pos_x = HALF_SCREEN_WIDTH, pos_y = HALF_SCREEN_HEIGHT):
+    def draw(self, screen, message, pos_x = HALF_SCREEN_WIDTH, pos_y = HALF_SCREEN_HEIGHT, color = (0,0,0)):
         
-        text = self.font.render(message, True, (0,0,0))
+        text = self.font.render(message, True, color)
         text_rect= text.get_rect()
         text_rect.center = (pos_x, pos_y)
         screen.blit(text, text_rect)
@@ -32,7 +32,7 @@ class Menu:
                 game.run()
 
     def reset(self, screen):
-        screen.fill((255,255,255))
+        screen.blit(BG_GAMEOVER, (0, 0))
 
     def update_meesage(self, message):
         self.text = self.font.render(message, True, (0,0,0))

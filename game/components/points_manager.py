@@ -19,6 +19,7 @@ class PointManager:
     def draw_score(self, screen):
         font = pygame.font.Font(FONT_STYLE, 30)
         text_1 = font.render(f'Score: {self.point}', True, (255, 255,255))
+
         text_rect_1= text_1.get_rect()
         text_rect_1.center = (1000, 50)
         screen.blit(text_1, text_rect_1)

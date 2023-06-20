@@ -27,7 +27,7 @@ class Enemy(Sprite):
         self.index = 0
         self.type = 'enemy'
         self.shooting_time = random.randint(30, 50)
-        
+        self.bullet_cooldown = 0
 
 
     def update(self, ships, game):
@@ -62,9 +62,7 @@ class Enemy(Sprite):
 
     def shoot(self, bullet_manager):
         current_time = pygame.time.get_ticks()
-        if self.shooting_time <= current_time:
+        if self.bullet_cooldown <= current_time:
             bullet = Bullet(self)
             bullet_manager.add_bullet(bullet)
-            self.shooting_time += random.randint(30, 50)
-
-    
+            self.bullet_cooldown = current_time + random.randint(30, 50)

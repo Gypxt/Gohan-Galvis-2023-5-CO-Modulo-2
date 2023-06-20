@@ -1,13 +1,14 @@
 import pygame
 
 
-from game.utils.constants import BG, FONT_STYLE, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, DEFAULT_TYPE
+from game.utils.constants import BG, FONT_STYLE, ICON, MUSIC_GAME, SCREEN_HEIGHT, SCREEN_WIDTH, SOUND_GAMEOVER, TITLE, FPS, DEFAULT_TYPE, TX_GAMEOVER_P1, TX_GAMEOVER_P2
 from game.components.spaceship import Spaceship
 from game.components.enemies.enemy_manager import EnemyManager
 from game.components.enemies.enemy import Enemy
 from game.components.bullets.bullet_manager import BulletManager
 from game.components.menu import Menu
 from game.components.points_manager import PointManager
+from game.components.power_ups.power_up_manager import PowerUpManager
 
 class Game:
     def __init__(self):
@@ -26,6 +27,8 @@ class Game:
         self.menu = Menu( self.screen)
         self.running = False
         self.points = PointManager()
+        self.power_up_manager = PowerUpManager()
+        self.game_over_sound_played = False
         
         
 
@@ -34,15 +37,17 @@ class Game:
         while self.running:
             if not self.playing:
                 self.show_menu()
-
         pygame.display.quit()
         pygame.quit()
     
       
     def run(self):
         # Game loop: events - update - draw
+        
         self.game_reset()
+        MUSIC_GAME.play()
         self.playing = True
+        self.game_over_sound_played = False
         while self.playing:
             self.events()
             self.update()
@@ -58,6 +63,7 @@ class Game:
         self.player.update(self)
         self.enemy_manager.update(self)
         self.bullet_manager.update(self)
+        self.power_up_manager.update(self)
 
         
 
@@ -69,6 +75,8 @@ class Game:
         self.enemy_manager.draw(self.screen)
         self.bullet_manager.draw(self.screen)
         self.points.draw_score(self.screen)
+        self.power_up_manager.draw(self.screen)
+        self.draw_power_up_time()
         pygame.display.update()
         # pygame.display.flip()
         
@@ -92,14 +100,18 @@ class Game:
         if self.points.death_count == 0:
             self.menu.draw(self.screen, 'Press Any KeyTo Star....')    
         else:
-            self.menu.draw(self.screen, 'Press Any KeyTo Star....')    
-            self.menu.draw(self.screen, f'Score: {self.points.point}', half_screen_whidth, 350)    
-            self.menu.draw(self.screen, f'Deaths: {self.points.death_count}', half_screen_whidth, 400)    
-            self.menu.draw(self.screen, f'Highest Score: {self.points.highest_score}', half_screen_whidth, 450)    
-            pass
-        icon = pygame.transform.scale(ICON,(80, 120))
-        self.screen.blit(icon, (half_screen_whidth - 50, half_screen_height - 150))
-
+            MUSIC_GAME.stop()
+            if not self.game_over_sound_played:  # Verificar si el sonido ya ha sido reproducido
+                SOUND_GAMEOVER.play()
+                self.game_over_sound_played = True
+            text_game_over = pygame.transform.scale(TX_GAMEOVER_P1,(400 , 117))
+            self.screen.blit(text_game_over, (80, half_screen_height - 60))
+            text_game_over = pygame.transform.scale(TX_GAMEOVER_P2,(400 , 117))
+            self.screen.blit(text_game_over, (650 , half_screen_height - 55))
+            self.menu.draw(self.screen, f'Score: {self.points.point}', half_screen_whidth, 260)    
+            self.menu.draw(self.screen, f'Deaths: {self.points.death_count}', half_screen_whidth, 310)    
+            self.menu.draw(self.screen, f'Highest Score: {self.points.highest_score}', half_screen_whidth, 360)    
+        
         self.menu.update(self)
 
     def game_reset(self):
@@ -107,5 +119,16 @@ class Game:
         self.enemy_manager.reset()
         self.points.reset()
         self.bullet_manager.reset()
+        self.power_up_manager.reset()
+        
 
-    
+    def draw_power_up_time(self):
+        if self.player.has_powe_up:
+            time_to_show = round((self.player.powe_time_up - pygame.time.get_ticks())/ 1000, 2)
+
+            if time_to_show >= 0:
+                self.menu.draw(self.screen,f'{self.player.power_up_type.capitalize()} is enable for {time_to_show}', 540, 50, (255, 255, 255))
+            else:
+                self.player.has_powe_up = False
+                self.player.power_up_type = DEFAULT_TYPE
+                self.player.set_image()

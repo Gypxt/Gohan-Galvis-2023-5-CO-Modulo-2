@@ -3,7 +3,7 @@ import pygame
 from pygame.sprite import Sprite
 from game.components.bullets.bullet import Bullet
 
-from game.utils.constants import SCREEN_HEIGHT, SPACESHIP, SCREEN_WIDTH
+from game.utils.constants import DEFAULT_TYPE, LASER_BULLET, SCREEN_HEIGHT, SPACESHIP, SCREEN_WIDTH
 
 class Spaceship(Sprite):
     # declaramos constantes, estas siempre estaran escritas en mallusculas 
@@ -19,8 +19,9 @@ class Spaceship(Sprite):
         self.rect.x = self.X_POS
         self.rect.y = self.Y_POS
         self.type = 'player'
-  
-    
+        self.power_up_type = DEFAULT_TYPE
+        self.has_powe_up = False
+        self.powe_time_up = 0
    
     def update(self, game):
         # Obtener el estado actual de las teclas
@@ -40,6 +41,7 @@ class Spaceship(Sprite):
 
         # Comprobar disparo
         if keys[pygame.K_e]:
+            LASER_BULLET.play()
             self.shoot(game.bullet_manager)
         
 
@@ -76,3 +78,12 @@ class Spaceship(Sprite):
     def reset(self):
         self.rect.x = self.X_POS
         self.rect.y = self.Y_POS
+        self.set_image()
+        self.power_up_type = DEFAULT_TYPE
+        self.has_powe_up = False
+        self.powe_time_up = 0
+   
+
+
+    def set_image(self, size=(40,60), image = SPACESHIP):
+        self.image = pygame.transform.scale(image, size)
